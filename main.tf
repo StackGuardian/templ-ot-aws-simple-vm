@@ -4,7 +4,7 @@ locals {
       Project     = var.name_prefix
       Environment = "demo"
       ManagedBy   = "opentofu"
-      Repository  = "aws-simple-vm"
+      Repository  = "tf-aws-simple-vm"
     },
     var.tags,
   )
