@@ -171,3 +171,15 @@ run "vpc_flow_logs_are_enabled" {
     error_message = "VPC flow logs must capture all traffic."
   }
 }
+
+# U-12
+run "broad_cidr_is_rejected" {
+  command = plan
+
+  variables {
+    enable_public_ip      = true
+    allowed_ingress_cidrs = ["128.0.0.0/1"]
+  }
+
+  expect_failures = [var.allowed_ingress_cidrs]
+}

@@ -6,6 +6,26 @@ OpenTofu demo template. Standalone, no dependency on other repos. Compatible wit
 
 ## Architecture
 
+```mermaid
+flowchart LR
+  admin([Admin]) -->|SSM Session Manager| ssm[SSM endpoints]
+  subgraph vpc[VPC, one AZ]
+    subgraph priv[Private subnet]
+      ssm
+      vm[EC2 instance]
+    end
+    subgraph pub[Public subnet]
+      eip[Elastic IP, opt-in]
+    end
+    s3[S3 gateway endpoint]
+  end
+  ssm --- vm
+  vm -->|package repos| s3
+  cidr([Allowed CIDRs]) -.->|opt-in, SSH| eip
+  eip -.-> vm
+  vpc -->|flow logs| cw[(CloudWatch Logs)]
+```
+
 - VPC with one public and one private subnet in a single AZ
 - Private subnet without an internet route. AWS services are reached through VPC endpoints (SSM, SSM Messages, EC2 Messages as interface endpoints, S3 as gateway endpoint for Amazon Linux package repos)
 - EC2 instance (Amazon Linux 2023) with an IAM instance profile for SSM
@@ -93,8 +113,9 @@ tofu destroy
 
 ## Tests
 
-Unit tests run with mocked providers on every push and pull request. Integration tests deploy real
-resources and run manually through the `integration` workflow. They need the repository variable `AWS_ROLE_ARN` (IAM role trusted for GitHub OIDC) and optionally `AWS_REGION`.
+The GitLab pipeline (`.gitlab-ci.yml`) lints every push. Merge requests into `development` or `main` also run
+validation, the checkov scan and the unit tests. A tag runs all of these plus the integration tests, which deploy
+real resources and destroy them again, and then creates a release. Integration tests run only when the CI/CD variable `AWS_ROLE_ARN` is set: an IAM role trusted for GitLab OIDC with the audience `sts.amazonaws.com`. `AWS_REGION` is optional.
 
 ```bash
 tofu test -test-directory=tests/unit
