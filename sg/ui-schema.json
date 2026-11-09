@@ -1,0 +1,17 @@
+{
+  "ui:order": [
+    "name_prefix",
+    "region",
+    "instance_type",
+    "vpc_cidr",
+    "enable_public_ip",
+    "allowed_ingress_cidrs",
+    "allowed_ingress_ports",
+    "ssh_public_key",
+    "log_retention_days",
+    "tags"
+  ],
+  "ssh_public_key": {
+    "ui:widget": "textarea"
+  }
+}
