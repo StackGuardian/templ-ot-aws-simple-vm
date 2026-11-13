@@ -5,7 +5,7 @@ data "aws_availability_zones" "available" {
 }
 
 resource "aws_vpc" "this" {
-  cidr_block           = var.vpc_cidr
+  cidr_block           = var.advanced_settings.vpc_cidr
   enable_dns_support   = true
   enable_dns_hostnames = true
 
@@ -19,7 +19,7 @@ resource "aws_default_security_group" "this" {
 
 resource "aws_subnet" "public" {
   vpc_id                  = aws_vpc.this.id
-  cidr_block              = cidrsubnet(var.vpc_cidr, 8, 0)
+  cidr_block              = cidrsubnet(var.advanced_settings.vpc_cidr, 8, 0)
   availability_zone       = data.aws_availability_zones.available.names[0]
   map_public_ip_on_launch = false
 
@@ -28,7 +28,7 @@ resource "aws_subnet" "public" {
 
 resource "aws_subnet" "private" {
   vpc_id            = aws_vpc.this.id
-  cidr_block        = cidrsubnet(var.vpc_cidr, 8, 1)
+  cidr_block        = cidrsubnet(var.advanced_settings.vpc_cidr, 8, 1)
   availability_zone = data.aws_availability_zones.available.names[0]
 
   tags = { Name = "${var.name_prefix}-private" }
@@ -78,7 +78,7 @@ resource "aws_security_group" "endpoints" {
 resource "aws_vpc_security_group_ingress_rule" "endpoints_https" {
   security_group_id = aws_security_group.endpoints.id
   description       = "HTTPS from the VPC"
-  cidr_ipv4         = var.vpc_cidr
+  cidr_ipv4         = var.advanced_settings.vpc_cidr
   ip_protocol       = "tcp"
   from_port         = 443
   to_port           = 443
@@ -111,7 +111,7 @@ resource "aws_cloudwatch_log_group" "flow_logs" {
   #checkov:skip=CKV_AWS_338:Demo template, retention is configurable via log_retention_days
   #checkov:skip=CKV_AWS_158:Encrypted with AWS-managed keys, customer-managed KMS is out of scope for the demo
   name              = "/${var.name_prefix}/vpc-flow-logs"
-  retention_in_days = var.log_retention_days
+  retention_in_days = var.advanced_settings.log_retention_days
 }
 
 resource "aws_iam_role" "flow_logs" {

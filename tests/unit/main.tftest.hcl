@@ -54,8 +54,10 @@ run "custom_tags_are_merged" {
   command = plan
 
   variables {
-    tags = {
-      Owner = "tester"
+    advanced_settings = {
+      tags = {
+        Owner = "tester"
+      }
     }
   }
 
@@ -120,7 +122,9 @@ run "public_ip_without_cidrs_is_rejected" {
   command = plan
 
   variables {
-    enable_public_ip = true
+    advanced_settings = {
+      enable_public_ip = true
+    }
   }
 
   expect_failures = [aws_instance.this]
@@ -131,11 +135,13 @@ run "open_cidr_is_rejected" {
   command = plan
 
   variables {
-    enable_public_ip      = true
-    allowed_ingress_cidrs = ["0.0.0.0/0"]
+    advanced_settings = {
+      enable_public_ip      = true
+      allowed_ingress_cidrs = ["0.0.0.0/0"]
+    }
   }
 
-  expect_failures = [var.allowed_ingress_cidrs]
+  expect_failures = [var.advanced_settings]
 }
 
 # U-10
@@ -143,9 +149,11 @@ run "public_ingress_is_restricted" {
   command = apply
 
   variables {
-    enable_public_ip      = true
-    allowed_ingress_cidrs = ["203.0.113.0/24"]
-    allowed_ingress_ports = [22]
+    advanced_settings = {
+      enable_public_ip      = true
+      allowed_ingress_cidrs = ["203.0.113.0/24"]
+      allowed_ingress_ports = [22]
+    }
   }
 
   assert {
@@ -177,9 +185,11 @@ run "broad_cidr_is_rejected" {
   command = plan
 
   variables {
-    enable_public_ip      = true
-    allowed_ingress_cidrs = ["128.0.0.0/1"]
+    advanced_settings = {
+      enable_public_ip      = true
+      allowed_ingress_cidrs = ["128.0.0.0/1"]
+    }
   }
 
-  expect_failures = [var.allowed_ingress_cidrs]
+  expect_failures = [var.advanced_settings]
 }

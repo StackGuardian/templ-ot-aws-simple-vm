@@ -5,8 +5,10 @@
 
 variables {
   name_prefix = "itest"
-  tags = {
-    Purpose = "integration-test"
+  advanced_settings = {
+    tags = {
+      Purpose = "integration-test"
+    }
   }
 }
 
@@ -46,8 +48,13 @@ run "deploy_with_public_ip" {
   command = apply
 
   variables {
-    enable_public_ip      = true
-    allowed_ingress_cidrs = ["203.0.113.0/24"]
+    advanced_settings = {
+      tags = {
+        Purpose = "integration-test"
+      }
+      enable_public_ip      = true
+      allowed_ingress_cidrs = ["203.0.113.0/24"]
+    }
   }
 
   assert {

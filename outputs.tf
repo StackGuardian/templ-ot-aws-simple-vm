@@ -20,5 +20,5 @@ output "ssm_command" {
 
 output "ssh_command" {
   description = "SSH command, null unless the public IP and an SSH key are set"
-  value       = var.enable_public_ip && var.ssh_public_key != null ? "ssh ec2-user@${one(aws_eip.this[*].public_ip)}" : null
+  value       = var.advanced_settings.enable_public_ip && var.ssh_public_key != null ? "ssh ec2-user@${one(aws_eip.this[*].public_ip)}" : null
 }

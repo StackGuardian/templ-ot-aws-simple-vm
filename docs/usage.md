@@ -24,14 +24,21 @@ Use it when you need one VM for a test, a demo or a small tool.
 |---|---|---|
 | Name prefix | Prefix for all resource names. 2 to 16 lowercase letters, digits or hyphens, starting with a letter | `demo` |
 | Region | AWS region | `eu-central-1` |
-| Tags | Extra tags added to all resources | none |
-| Instance type | Size of the server (x86_64) | `t3.micro` |
+| Instance type | Size of the server (x86_64), chosen from a list of general-purpose and burstable types | `t3.micro` |
+| SSH public key | Your public SSH key, for SSH login with a public IP. Leave empty to use only Session Manager | empty |
+
+### Advanced settings
+
+These fields appear after you tick "Show advanced settings". Most deployments keep the defaults.
+
+| Field | What it does | Default |
+|---|---|---|
 | VPC cidr | IP range of the new network | `10.0.0.0/16` |
 | Enable public ip | Puts the server in the public subnet and gives it a public IP | off |
 | Allowed ingress cidrs | IP ranges that may connect when the public IP is on. Required in that case. `0.0.0.0/0` and ranges broader than `/8` are rejected | empty |
 | Allowed ingress ports | TCP ports opened for those ranges | `22` |
-| SSH public key | Your public SSH key, for SSH login with a public IP. Leave empty to use only Session Manager | empty |
-| Log retention days | How long flow logs are kept | `90` |
+| Log retention days | How long flow logs are kept, chosen from the values CloudWatch Logs accepts | `90` |
+| Tags | Extra tags added to all resources | none |
 
 For a quick demo, keep all defaults and connect with Session Manager.
 

@@ -37,7 +37,7 @@ flowchart LR
 
 - IMDSv2 enforced, encrypted gp3 root volume, detailed monitoring
 - Default: instance in the private subnet, no public IP, no inbound rules. Access through SSM Session Manager
-- Public IP only on opt-in. Inbound traffic limited to `allowed_ingress_cidrs` and `allowed_ingress_ports`; `0.0.0.0/0` is rejected
+- Public IP only on opt-in. Inbound traffic limited to `advanced_settings.allowed_ingress_cidrs` and `advanced_settings.allowed_ingress_ports`; `0.0.0.0/0` is rejected
 - SSH with a key pair only
 - Default security group of the VPC has no rules
 - VPC flow logs capture all traffic
@@ -46,7 +46,7 @@ Accepted checkov findings (documented inline in the code):
 
 | Check | Reason |
 |---|---|
-| CKV_AWS_338 | Log retention is configurable (`log_retention_days`, default 90) |
+| CKV_AWS_338 | Log retention is configurable (`advanced_settings.log_retention_days`, default 90) |
 | CKV_AWS_158 | Log group uses AWS-managed encryption, customer-managed KMS is out of scope |
 | CKV_AWS_394 | Single-AZ demo, only the first zone is used |
 
@@ -69,7 +69,7 @@ Default (no public IP), through SSM Session Manager. Needs the AWS CLI and the S
 aws ssm start-session --target <instance_id> --region <region>
 ```
 
-With `enable_public_ip = true` and `ssh_public_key` set, SSH from an allowed CIDR:
+With `advanced_settings.enable_public_ip = true` and `ssh_public_key` set, SSH from an allowed CIDR:
 
 ```bash
 ssh ec2-user@<public_ip>
@@ -82,14 +82,20 @@ ssh ec2-user@<public_ip>
 |---|---|---|
 | `name_prefix` | Prefix for all resource names | `"demo"` |
 | `region` | AWS region | `"eu-central-1"` |
-| `tags` | Additional tags for all resources | `{}` |
 | `instance_type` | EC2 instance type (x86_64) | `"t3.micro"` |
+| `ssh_public_key` | SSH public key, `null` means SSM only | `null` |
+| `advanced_settings` | Object with the settings below, all optional | `{}` |
+
+`advanced_settings` attributes (shown as "Advanced Settings" in the StackGuardian form):
+
+| Name | Description | Default |
+|---|---|---|
 | `vpc_cidr` | CIDR block of the VPC | `"10.0.0.0/16"` |
 | `enable_public_ip` | Public subnet and Elastic IP | `false` |
 | `allowed_ingress_cidrs` | Allowed source CIDRs, required with a public IP, `/0` rejected | `[]` |
 | `allowed_ingress_ports` | Opened TCP ports | `[22]` |
-| `ssh_public_key` | SSH public key, `null` means SSM only | `null` |
 | `log_retention_days` | Flow log retention | `90` |
+| `tags` | Additional tags for all resources | `{}` |
 
 ## Outputs
 

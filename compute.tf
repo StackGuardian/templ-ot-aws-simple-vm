@@ -68,7 +68,7 @@ resource "aws_key_pair" "this" {
 resource "aws_instance" "this" {
   ami                         = data.aws_ami.al2023.id
   instance_type               = var.instance_type
-  subnet_id                   = var.enable_public_ip ? aws_subnet.public.id : aws_subnet.private.id
+  subnet_id                   = var.advanced_settings.enable_public_ip ? aws_subnet.public.id : aws_subnet.private.id
   vpc_security_group_ids      = [aws_security_group.instance.id]
   iam_instance_profile        = aws_iam_instance_profile.instance.name
   key_name                    = one(aws_key_pair.this[*].key_name)
@@ -91,7 +91,7 @@ resource "aws_instance" "this" {
 
   lifecycle {
     precondition {
-      condition     = !var.enable_public_ip || length(var.allowed_ingress_cidrs) > 0
+      condition     = !var.advanced_settings.enable_public_ip || length(var.advanced_settings.allowed_ingress_cidrs) > 0
       error_message = "allowed_ingress_cidrs must be set when enable_public_ip is true."
     }
   }
@@ -100,7 +100,7 @@ resource "aws_instance" "this" {
 }
 
 resource "aws_eip" "this" {
-  count = var.enable_public_ip ? 1 : 0
+  count = var.advanced_settings.enable_public_ip ? 1 : 0
 
   domain   = "vpc"
   instance = aws_instance.this.id

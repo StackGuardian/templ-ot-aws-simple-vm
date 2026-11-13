@@ -1,17 +1,60 @@
 {
+  "name_prefix": {
+    "ui:title": "Name Prefix",
+    "ui:description": "Prefix for all resource names"
+  },
+  "region": {
+    "ui:title": "Region",
+    "ui:description": "AWS region"
+  },
+  "instance_type": {
+    "ui:title": "Instance Type",
+    "ui:description": "EC2 instance type (x86_64)"
+  },
+  "ssh_public_key": {
+    "ui:title": "SSH Public Key",
+    "ui:description": "SSH public key for the ec2-user. Leave empty to use SSM Session Manager only.",
+    "ui:widget": "textarea"
+  },
+  "advanced_settings": {
+    "show_advanced_settings": {
+      "ui:title": "Show advanced settings"
+    },
+    "vpc_cidr": {
+      "ui:title": "VPC CIDR"
+    },
+    "enable_public_ip": {
+      "ui:title": "Enable Public IP"
+    },
+    "allowed_ingress_cidrs": {
+      "ui:title": "Allowed Ingress CIDRs"
+    },
+    "allowed_ingress_ports": {
+      "ui:title": "Allowed Ingress Ports"
+    },
+    "log_retention_days": {
+      "ui:title": "Log Retention Days"
+    },
+    "tags": {
+      "ui:title": "Tags"
+    },
+    "ui:order": [
+      "show_advanced_settings",
+      "vpc_cidr",
+      "enable_public_ip",
+      "allowed_ingress_cidrs",
+      "allowed_ingress_ports",
+      "log_retention_days",
+      "tags"
+    ],
+    "ui:title": "Advanced Settings",
+    "ui:description": "Optional settings, most deployments keep the defaults"
+  },
   "ui:order": [
     "name_prefix",
     "region",
     "instance_type",
-    "vpc_cidr",
-    "enable_public_ip",
-    "allowed_ingress_cidrs",
-    "allowed_ingress_ports",
     "ssh_public_key",
-    "log_retention_days",
-    "tags"
-  ],
-  "ssh_public_key": {
-    "ui:widget": "textarea"
-  }
+    "advanced_settings"
+  ]
 }
