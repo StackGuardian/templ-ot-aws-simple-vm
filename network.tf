@@ -107,6 +107,7 @@ resource "aws_vpc_endpoint" "s3" {
 }
 
 # VPC flow logs
+#trivy:ignore:AVD-AWS-0017 Encrypted with AWS-managed keys, customer-managed KMS is out of scope for the demo
 resource "aws_cloudwatch_log_group" "flow_logs" {
   #checkov:skip=CKV_AWS_338:Demo template, retention is configurable via log_retention_days
   #checkov:skip=CKV_AWS_158:Encrypted with AWS-managed keys, customer-managed KMS is out of scope for the demo
