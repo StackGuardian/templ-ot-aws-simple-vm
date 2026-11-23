@@ -193,3 +193,31 @@ run "broad_cidr_is_rejected" {
 
   expect_failures = [var.advanced_settings]
 }
+
+# U-13
+run "create_vm_for_ami_check" {
+  command = apply
+
+  override_data {
+    target = data.aws_ami.al2023
+    values = {
+      id = "ami-0123456789abcdef0"
+    }
+  }
+}
+
+run "new_ami_does_not_replace_the_vm" {
+  command = plan
+
+  override_data {
+    target = data.aws_ami.al2023
+    values = {
+      id = "ami-0fedcba9876543210"
+    }
+  }
+
+  assert {
+    condition     = aws_instance.this.ami != "ami-0fedcba9876543210"
+    error_message = "A newer AMI must not change the instance, which would replace the VM."
+  }
+}
