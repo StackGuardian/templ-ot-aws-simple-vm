@@ -33,6 +33,7 @@ tofu test -test-directory=tests/integration   # needs cloud credentials
 | U-10 | Unit | With public IP enabled: public subnet, Elastic IP, ingress only from the given CIDRs and ports | done |
 | U-11 | Unit | VPC flow logs capture all traffic | done |
 | U-12 | Unit | `advanced_settings.allowed_ingress_cidrs` broader than `/8` (for example `128.0.0.0/1`) is rejected | done |
+| U-13 | Unit | A newer Amazon Linux AMI does not change the instance (no replacement on a later run) | done |
 | I-01 | Integration | Default deployment: instance is running and has no public IP | done |
 | I-02 | Integration | Instance registers with SSM Session Manager (waits 3 minutes) | done |
 | I-03 | Integration | With `advanced_settings.enable_public_ip = true`: public IP output is set | done |
