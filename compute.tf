@@ -91,6 +91,10 @@ resource "aws_instance" "this" {
   tags = { Name = "${var.name_prefix}-vm" }
 
   lifecycle {
+    # The image is picked once, when the VM is created. Without this, every new
+    # Amazon Linux release changes `ami` and the next run would replace the VM.
+    ignore_changes = [ami]
+
     precondition {
       condition     = !var.advanced_settings.enable_public_ip || length(var.advanced_settings.allowed_ingress_cidrs) > 0
       error_message = "allowed_ingress_cidrs must be set when enable_public_ip is true."

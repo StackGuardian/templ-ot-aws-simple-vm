@@ -64,5 +64,7 @@ The server is billed per hour. The three private service connections (VPC endpoi
 
 ## Limits
 
+- The server image is chosen once, when the VM is created. A later run does not replace the VM when Amazon publishes a newer image. To move to a newer image, destroy the deployment and deploy it again; the data on the disk is lost
+
 - One availability zone, no high availability
 - No internet access from the private subnet beyond the AWS services listed above
