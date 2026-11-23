@@ -9,7 +9,8 @@ data "aws_ami" "al2023" {
 }
 
 resource "aws_iam_role" "instance" {
-  name = "${var.name_prefix}-vm"
+  # IAM names are unique per account, so a generated name keeps a second deployment from clashing.
+  name_prefix = "${var.name_prefix}-vm-"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -19,6 +20,10 @@ resource "aws_iam_role" "instance" {
       Action    = "sts:AssumeRole"
     }]
   })
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_iam_role_policy_attachment" "ssm" {
@@ -27,8 +32,12 @@ resource "aws_iam_role_policy_attachment" "ssm" {
 }
 
 resource "aws_iam_instance_profile" "instance" {
-  name = "${var.name_prefix}-vm"
-  role = aws_iam_role.instance.name
+  name_prefix = "${var.name_prefix}-vm-"
+  role        = aws_iam_role.instance.name
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_security_group" "instance" {
@@ -60,10 +69,10 @@ resource "aws_vpc_security_group_ingress_rule" "public" {
 }
 
 resource "aws_key_pair" "this" {
-  count = var.ssh_public_key == null ? 0 : 1
+  count = local.ssh_public_key == null ? 0 : 1
 
   key_name   = "${var.name_prefix}-vm"
-  public_key = var.ssh_public_key
+  public_key = local.ssh_public_key
 }
 
 resource "aws_instance" "this" {
@@ -94,6 +103,11 @@ resource "aws_instance" "this" {
     # The image is picked once, when the VM is created. Without this, every new
     # Amazon Linux release changes `ami` and the next run would replace the VM.
     ignore_changes = [ami]
+
+    precondition {
+      condition     = local.az != null
+      error_message = "No availability zone in this region offers the instance type. Pick another instance type or region."
+    }
 
     precondition {
       condition     = !var.advanced_settings.enable_public_ip || length(var.advanced_settings.allowed_ingress_cidrs) > 0

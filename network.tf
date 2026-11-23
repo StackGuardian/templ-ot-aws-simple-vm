@@ -1,8 +1,19 @@
-# The VM uses only the first zone, so new zones do not change anything.
 data "aws_availability_zones" "available" {
-  #checkov:skip=CKV_AWS_394:Single-AZ demo, only names[0] is used
+  #checkov:skip=CKV_AWS_394:Single-AZ demo, only the first zone that offers the instance type is used
   state = "available"
 }
+
+# Not every zone offers every instance type, so the zone is picked from this list (local.az).
+data "aws_ec2_instance_type_offerings" "this" {
+  location_type = "availability-zone"
+
+  filter {
+    name   = "instance-type"
+    values = [var.instance_type]
+  }
+}
+
+data "aws_caller_identity" "current" {}
 
 resource "aws_vpc" "this" {
   cidr_block           = var.advanced_settings.vpc_cidr
@@ -20,7 +31,7 @@ resource "aws_default_security_group" "this" {
 resource "aws_subnet" "public" {
   vpc_id                  = aws_vpc.this.id
   cidr_block              = cidrsubnet(var.advanced_settings.vpc_cidr, 8, 0)
-  availability_zone       = data.aws_availability_zones.available.names[0]
+  availability_zone       = local.az
   map_public_ip_on_launch = false
 
   tags = { Name = "${var.name_prefix}-public" }
@@ -29,7 +40,7 @@ resource "aws_subnet" "public" {
 resource "aws_subnet" "private" {
   vpc_id            = aws_vpc.this.id
   cidr_block        = cidrsubnet(var.advanced_settings.vpc_cidr, 8, 1)
-  availability_zone = data.aws_availability_zones.available.names[0]
+  availability_zone = local.az
 
   tags = { Name = "${var.name_prefix}-private" }
 }
@@ -111,12 +122,13 @@ resource "aws_vpc_endpoint" "s3" {
 resource "aws_cloudwatch_log_group" "flow_logs" {
   #checkov:skip=CKV_AWS_338:Demo template, retention is configurable via log_retention_days
   #checkov:skip=CKV_AWS_158:Encrypted with AWS-managed keys, customer-managed KMS is out of scope for the demo
-  name              = "/${var.name_prefix}/vpc-flow-logs"
+  name              = "/${var.name_prefix}-${local.suffix}/vpc-flow-logs"
   retention_in_days = var.advanced_settings.log_retention_days
 }
 
 resource "aws_iam_role" "flow_logs" {
-  name = "${var.name_prefix}-vpc-flow-logs"
+  # IAM names are unique per account, so a generated name keeps a second deployment from clashing.
+  name_prefix = "${var.name_prefix}-vpc-flow-logs-"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -124,8 +136,17 @@ resource "aws_iam_role" "flow_logs" {
       Effect    = "Allow"
       Principal = { Service = "vpc-flow-logs.amazonaws.com" }
       Action    = "sts:AssumeRole"
+      # Confused deputy protection: only flow logs of this account may use the role.
+      Condition = {
+        StringEquals = { "aws:SourceAccount" = data.aws_caller_identity.current.account_id }
+        ArnLike      = { "aws:SourceArn" = "arn:aws:ec2:${var.region}:${data.aws_caller_identity.current.account_id}:vpc-flow-log/*" }
+      }
     }]
   })
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_iam_role_policy" "flow_logs" {

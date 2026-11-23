@@ -34,6 +34,11 @@ tofu test -test-directory=tests/integration   # needs cloud credentials
 | U-11 | Unit | VPC flow logs capture all traffic | done |
 | U-12 | Unit | `advanced_settings.allowed_ingress_cidrs` broader than `/8` (for example `128.0.0.0/1`) is rejected | done |
 | U-13 | Unit | A newer Amazon Linux AMI does not change the instance (no replacement on a later run) | done |
+| U-14 | Unit | An empty `ssh_public_key` creates no key pair | done |
+| U-15 | Unit | An `ssh_public_key` of a type EC2 does not accept (for example ECDSA) is rejected, an ED25519 key creates a key pair | done |
+| U-16 | Unit | The subnets are in a zone that offers the instance type, and an instance type offered nowhere is rejected | done |
+| U-17 | Unit | IAM roles and the instance profile get generated names, and the flow log role can only be assumed for flow logs of this account | done |
+| U-18 | Unit | The flow log group name has a per deployment suffix | done |
 | I-01 | Integration | Default deployment: instance is running and has no public IP | done |
 | I-02 | Integration | Instance registers with SSM Session Manager (waits 3 minutes) | done |
 | I-03 | Integration | With `advanced_settings.enable_public_ip = true`: public IP output is set | done |
