@@ -15,17 +15,17 @@ Use it when you need one VM for a test, a demo or a small tool.
 ## Before you start
 
 - A workflow with an AWS cloud connector for the target account
-- Permissions to create VPC, EC2, IAM and CloudWatch Logs resources
+- Permissions to create VPC, EC2, IAM and CloudWatch Logs resources. This includes `iam:PassRole` for the instance profile and the flow log role, and `ec2:DescribeInstanceTypeOfferings`, which the run uses to pick a zone that offers your instance type
 - To connect with Session Manager: the AWS CLI with the Session Manager plugin
 
 ## Form fields
 
 | Field | What it does | Default |
 |---|---|---|
-| Name prefix | Prefix for all resource names. 2 to 16 lowercase letters, digits or hyphens, starting with a letter | `demo` |
+| Name prefix | Prefix for all resource names. 2 to 16 lowercase letters, digits or hyphens, starting with a letter. A generated suffix is added to the IAM roles and the log group, so you can deploy twice in one account with the same prefix. The SSH key pair keeps the plain name: use a different prefix for a second deployment with an SSH key in the same region | `demo` |
 | Region | AWS region | `eu-central-1` |
 | Instance type | Size of the server (x86_64), chosen from a list of general-purpose and burstable types | `t3.micro` |
-| SSH public key | Your public SSH key, for SSH login with a public IP. Leave empty to use only Session Manager | empty |
+| SSH public key | Your public SSH key (RSA or ED25519), for SSH login with a public IP. Leave empty to use only Session Manager | empty |
 
 ### Advanced settings
 
@@ -34,7 +34,7 @@ These fields appear after you tick "Show advanced settings". Most deployments ke
 | Field | What it does | Default |
 |---|---|---|
 | VPC cidr | IP range of the new network | `10.0.0.0/16` |
-| Enable public ip | Puts the server in the public subnet and gives it a public IP | off |
+| Enable public ip | Puts the server in the public subnet and gives it a public IP. **Switching it on or off later replaces the server** (it moves to the other subnet) and the data on its disk is lost | off |
 | Allowed ingress cidrs | IP ranges that may connect when the public IP is on. Required in that case. `0.0.0.0/0` and ranges broader than `/8` are rejected | empty |
 | Allowed ingress ports | TCP ports opened for those ranges | `22` |
 | Log retention days | How long flow logs are kept, chosen from the values CloudWatch Logs accepts | `90` |
@@ -66,5 +66,5 @@ The server is billed per hour. The three private service connections (VPC endpoi
 
 - The server image is chosen once, when the VM is created. A later run does not replace the VM when Amazon publishes a newer image. To move to a newer image, destroy the deployment and deploy it again; the data on the disk is lost
 
-- One availability zone, no high availability
+- One availability zone, no high availability. The zone is the first one in the region that offers your instance type
 - No internet access from the private subnet beyond the AWS services listed above

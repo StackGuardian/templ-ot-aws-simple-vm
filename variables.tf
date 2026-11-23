@@ -22,9 +22,14 @@ variable "instance_type" {
 }
 
 variable "ssh_public_key" {
-  description = "SSH public key for the ec2-user. Leave null to use SSM Session Manager only."
+  description = "SSH public key for the ec2-user. Leave null or empty to use SSM Session Manager only."
   type        = string
   default     = null
+
+  validation {
+    condition     = var.ssh_public_key == null || var.ssh_public_key == "" || can(regex("^(ssh-ed25519|ssh-rsa) ", var.ssh_public_key))
+    error_message = "Use an RSA or ED25519 public key, for example \"ssh-ed25519 AAAA...\". EC2 does not accept other key types."
+  }
 }
 
 # Grouped so the StackGuardian form can show them in one "Advanced Settings" section.

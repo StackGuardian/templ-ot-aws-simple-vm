@@ -120,7 +120,9 @@
       ]
     },
     "ssh_public_key": {
-      "type": "string"
+      "type": "string",
+      "description": "RSA or ED25519 public key for SSH login with a public IP, for example ssh-ed25519 AAAA... Leave empty to use only Session Manager",
+      "pattern": "^((ssh-ed25519|ssh-rsa) .+)?$"
     },
     "advanced_settings": {
       "type": "object",

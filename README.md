@@ -48,7 +48,7 @@ Accepted checkov findings (documented inline in the code):
 |---|---|
 | CKV_AWS_338 | Log retention is configurable (`advanced_settings.log_retention_days`, default 90) |
 | CKV_AWS_158 | Log group uses AWS-managed encryption, customer-managed KMS is out of scope |
-| CKV_AWS_394 | Single-AZ demo, only the first zone is used |
+| CKV_AWS_394 | Single-AZ demo, only the first zone that offers the instance type is used |
 
 The Trivy scan (`trivy config`) accepts findings with `#trivy:ignore` comments above the resource. The reason is written in the same line.
 
@@ -85,7 +85,7 @@ ssh ec2-user@<public_ip>
 | `name_prefix` | Prefix for all resource names | `"demo"` |
 | `region` | AWS region | `"eu-central-1"` |
 | `instance_type` | EC2 instance type (x86_64) | `"t3.micro"` |
-| `ssh_public_key` | SSH public key, `null` means SSM only | `null` |
+| `ssh_public_key` | SSH public key (RSA or ED25519), `null` or empty means SSM only | `null` |
 | `advanced_settings` | Object with the settings below, all optional | `{}` |
 
 `advanced_settings` attributes (shown as "Advanced Settings" in the StackGuardian form):
